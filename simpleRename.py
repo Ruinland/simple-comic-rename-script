@@ -12,8 +12,9 @@ from PyQt5.QtGui import *
 leagalPicType = ['gif','jpeg','bmp','png']
 
 def isPic(filenameWithPath):
-    if imghdr.what(filenameWithPath) in leagalPicType:
-        return True
+    if os.path.isfile(filenameWithPath):
+        if imghdr.what(filenameWithPath) in leagalPicType:
+            return True
 
 class workingWidget(QWidget):
     def __init__(self):
@@ -22,7 +23,7 @@ class workingWidget(QWidget):
         self.fileList.sort()
 
 
-        grid = QVBoxLayout()
+        grid = QBoxLayout(QBoxLayout.TopToBottom)
         hbox = QHBoxLayout()
 
 
@@ -31,18 +32,23 @@ class workingWidget(QWidget):
 
         self.renameButton=QPushButton("Rename them(&R)", self)
         self.renameButton.clicked.connect(self.doRename)
+        self.renameButton.setMaximumWidth(100)
 
         self.putToPending=QPushButton("===>(&K)", self)
         self.putToPending.clicked.connect(self.doPutPending)
+        self.putToPending.setMaximumWidth(100)
 
         self.putUp=QPushButton("↑(&U)", self)
         self.putUp.clicked.connect(self.doPutUp)
+        self.putUp.setMaximumWidth(100)
 
         self.putDown=QPushButton("↓(&I)", self)
         self.putDown.clicked.connect(self.doPutDown)
+        self.putDown.setMaximumWidth(100)
 
         self.removeFromPending=QPushButton("<===(&J)", self)
         self.removeFromPending.clicked.connect(self.doRemovePending)
+        self.removeFromPending.setMaximumWidth(100)
 
         grid.layout().addWidget(self.putToPending)
         grid.layout().addWidget(self.removeFromPending)
@@ -51,15 +57,19 @@ class workingWidget(QWidget):
         grid.layout().addWidget(self.renameButton)
         
         self.picList = QListWidget(self)
+        self.picList.setMaximumWidth(200)
         self.picList.addItems(self.fileList)
         self.picList.setCurrentRow(0)
         self.picList.currentItemChanged.connect(self.onItemChanged)
 
         self.changeList = QListWidget(self)
+        self.changeList.setMaximumWidth(200)
         self.changeList.currentItemChanged.connect(self.onItemChanged)
 
         self.lbl = QtWidgets.QLabel(self)
-        self.lbl.setPixmap(QtGui.QPixmap(self.fileList[0]))
+        self.lbl.setMaximumSize(500,700)
+        if self.picList.count() > 0 :
+            self.lbl.setPixmap(QtGui.QPixmap(self.fileList[0]).scaled(500,700))
 
         hbox.layout().addWidget(self.picList)
         hbox.layout().addWidget(self.changeList)
@@ -95,7 +105,7 @@ class workingWidget(QWidget):
 
     def onItemChanged(self,curr,prev):
         if curr != None :
-            self.lbl.setPixmap(QtGui.QPixmap(curr.text()))
+            self.lbl.setPixmap(QtGui.QPixmap(curr.text()).scaled(500,700))
             self.currListFile = curr.text()
 
     def doRename(self):
@@ -115,7 +125,9 @@ class workingWidget(QWidget):
         self.picList.addItems(self.fileList)
         self.picList.setCurrentRow(0)
 
-app=QApplication(sys.argv)
-workWidget=workingWidget()
-workWidget.show()
-sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    app=QApplication(sys.argv)
+    workWidget=workingWidget()
+    workWidget.show()
+    sys.exit(app.exec_())
